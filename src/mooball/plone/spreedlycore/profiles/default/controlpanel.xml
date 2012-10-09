@@ -4,16 +4,26 @@
         xmlns:i18n="http://xml.zope.org/namespaces/i18n"
         i18n:domain="mooball.plone.spreedlycore">
           
- <configlet title="Spreedly Configuration"
-            action_id="mooball.plone.spreedlycore.configlet.SpreedlyConfiglet"
+ <configlet title="Spreedly Login Configuration"
+            action_id="mooball.plone.spreedlycore.configlet.SpreedlyLoginConfiglet"
             appId="mooball.plone.spreedlycore"
             category="Products"
             condition_expr=""
-            url_expr="string:${portal_url}/@@spreedly_config"
+            url_expr="string:${portal_url}/@@spreedly_loginconfig"
             visible="True"
             i18n:attributes="title"
             icon_expr="string:++resource++spreedly_icon.gif">
   <permission>Manage portal</permission>
  </configlet>
- 
+ <configlet title="Spreedly Gateway Configuration"
+            action_id="mooball.plone.spreedlycore.configlet.SpreedlyGatewayConfiglet"
+            appId="mooball.plone.spreedlycore"
+            category="Products"
+            condition_expr=""
+            url_expr="string:${portal_url}/@@spreedly_gatewayconfig"
+            visible="True"
+            i18n:attributes="title"
+            icon_expr="string:++resource++spreedly_icon.gif">
+  <permission>Manage portal</permission>
+ </configlet>
 </object>

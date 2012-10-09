@@ -20,11 +20,8 @@ Installation
 ------------
 
 To get started, download spreedly-core-python and place in directory below.
-
 Create and add the following to mooball.plone.spreedlycore/buildout.cfg:
 
 [buildout]
-
 develop += ../spreedly-core-python/
-
 eggs += spreedly-core-python
