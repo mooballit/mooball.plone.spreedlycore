@@ -2,7 +2,7 @@
 Spreedly Configuration Wrapper
 ==============================
 
-Spreedly Core Python Library is a Python wrapper for the Spreedly Core API.
+Plone Configlet to configure Spreedly Core.
 
 License
 -------
