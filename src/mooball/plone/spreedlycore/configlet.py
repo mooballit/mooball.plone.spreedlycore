@@ -27,6 +27,9 @@ class GatewayVocabulary(object):
     grok.implements(IVocabularyFactory)
     
     def __call__(self, context):
+        """ Named Vocabulary for the default_spreedly_gateway field, update
+            contents according to the existing gateways.
+        """
         registry = queryUtility(IRegistry)
         terms = []
         
@@ -42,8 +45,8 @@ class GatewayVocabulary(object):
 grok.global_utility(GatewayVocabulary, name=u"mooball.plone.spreedlycore.Gateway")
 
 class ISpreedlyLoginSettings(Interface):
-    """Global Spreedly Login settings. This describes records stored in the
-    configuration registry and obtainable via plone.registry.
+    """ Global Spreedly Login settings. This describes records stored in the
+        configuration registry and obtainable via plone.registry.
     """
     
     spreedly_login = field.TextLine(title=_(u"Spreedly Login"),
@@ -79,6 +82,9 @@ class SpreedlyLoginSettingsEditForm(controlpanel.RegistryEditForm):
     
     @button.buttonAndHandler(_('Save'), name=None)
     def handleSave(self, action):
+        """ When save button pressed, check for errors, attempt to connect to
+            API, and throw error if key wrong, otherwise, continue.
+        """
         data, errors = self.extractData()
         
         if errors:
@@ -89,7 +95,7 @@ class SpreedlyLoginSettingsEditForm(controlpanel.RegistryEditForm):
             connect = spreedlycore.APIConnection(data['spreedly_login'], data['spreedly_secret'])
             gateway = connect.gateways()
         except urllib2.HTTPError, e:
-            IStatusMessage(self.request).addStatusMessage(_(u"The credentials that were provided are incorrect. " + unicode(e)), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"The credentials that were provided are incorrect. SpreedlyCore.com returned " + unicode(e)), "error")
             self.context.REQUEST.RESPONSE.redirect("@@spreedly_loginconfig")
             return
         
@@ -106,12 +112,15 @@ class SpreedlyLoginSettingsEditForm(controlpanel.RegistryEditForm):
                                                   self.control_panel_view))
 
 class SpreedlyLoginConfiglet(controlpanel.ControlPanelFormWrapper):
-    """Spreedly Login Configlet
+    """ Spreedly Login Configlet
     """
     form = SpreedlyLoginSettingsEditForm
     index = ViewPageTemplateFile('configlet.pt')
 
     def settings(self):
+        """ Returns the classes for use in the JavaScript to hide the Gateway
+            drop down select.
+        """
         registry = queryUtility(IRegistry)
         settings = registry.forInterface(ISpreedlyLoginSettings, check=False)
         output = []
@@ -127,10 +136,24 @@ class SpreedlyLoginConfiglet(controlpanel.ControlPanelFormWrapper):
         
         return ' '.join(output)
     
-    def gateway_info(self):
+    def credentials_entered(self):
+        """ Check if the Login and Secret have been entered
+        """
         classes = self.settings()
         
         if "spreedly_login" in classes and "spreedly_secret" in classes:
+            return True
+        else:
+            return False
+    
+    def gateway_entered(self):
+        """ Check if the Login and Secret have been entered, and if the gateway
+            has not. Used in the template to check middle case where there's no
+            gateway selected.
+        """
+        classes = self.settings()
+        
+        if "spreedly_login" in classes and "spreedly_secret" in classes and not "default_spreedly_gateway" in classes:
             return False
         else:
             return True

@@ -6,20 +6,13 @@
       metal:use-macro="here/prefs_main_template/macros/master"
       i18n:domain="mooball.plone.spreedlycore">
 
-<metal:javascript_head_slot fill-slot="javascript_head_slot">
-    <script type="text/javascript"
-        tal:attributes="src string:${context/portal_url}/++resource++mooball.plone.spreedlycore/javascripts/configlet.js">
-    </script>
-</metal:javascript_head_slot>
-
-
 <body>
 <div id="content"
      tal:attributes="class view/settings"
      metal:fill-slot="prefs_configlet_content">
 
     <script type="text/javascript"
-        tal:attributes="src string:${context/portal_url}/++resource++mooball.plone.spreedlycore/javascripts/configlet.js">
+        tal:attributes="src string:${context/portal_url}/++resource++mooball.plone.spreedlycore.javascripts/configlet.js">
     </script>
     
     <div metal:use-macro="context/global_statusmessage/macros/portal_message">
@@ -35,27 +28,25 @@
 
     <h1 class="documentFirstHeading" tal:content="view/label">View Title</h1>
 
-    <tal:if condition="view/gateway_info">
-        <dl class="portalMessage info">
-            <dt i18n:translate="">
-                Info
-            </dt>
-            <dd>
-                Before you can configure a gateway, credentials must be entered in first.
-            </dd>
-        </dl>
-    </tal:if>
-    <tal:else condition="not:view/gateway_info">
-        <dl class="portalMessage info">
-            <dt i18n:translate="">
-                Info
-            </dt>
-            <dd>
-                Credentials are added, feel free to choose a gateway.
-            </dd>
-        </dl>
-    </tal:else>
 
+    <dl class="portalMessage info" tal:condition="not:view/credentials_entered">
+        <dt i18n:translate="">
+            Info
+        </dt>
+        <dd>
+            Before you can configure a gateway, credentials must be entered in first.
+        </dd>
+    </dl>
+    
+    <dl class="portalMessage info" tal:condition="not:view/gateway_entered">
+        <dt i18n:translate="">
+            Info
+        </dt>
+        <dd>
+            Credentials are added, feel free to choose a gateway.
+        </dd>
+    </dl>
+    
     <div id="layout-contents">
         <span tal:replace="structure view/contents" />
     </div>

@@ -31,4 +31,10 @@
       name="spreedly_icon.gif"
       image="spreedly_icon.gif"
       />
+  
+  <browser:resourceDirectory
+      name="mooball.plone.spreedlycore.javascripts"
+      directory="javascripts"
+      />
+
 </configure>

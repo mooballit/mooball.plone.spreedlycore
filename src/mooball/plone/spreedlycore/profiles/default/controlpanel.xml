@@ -4,7 +4,7 @@
         xmlns:i18n="http://xml.zope.org/namespaces/i18n"
         i18n:domain="mooball.plone.spreedlycore">
           
- <configlet title="Spreedly Login Configuration"
+ <configlet title="Spreedly Credentials Configuration"
             action_id="mooball.plone.spreedlycore.configlet.SpreedlyLoginConfiglet"
             appId="mooball.plone.spreedlycore"
             category="Products"
