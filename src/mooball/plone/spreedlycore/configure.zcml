@@ -27,13 +27,6 @@
       permission="cmf.ManagePortal"
       />
   
-  <browser:page
-      for="Products.CMFCore.interfaces.ISiteRoot"
-      name="spreedly_gatewayconfig"
-      class=".configlet.SpreedlyGatewayConfiglet"
-      permission="cmf.ManagePortal"
-      />
-  
   <browser:resource
       name="spreedly_icon.gif"
       image="spreedly_icon.gif"

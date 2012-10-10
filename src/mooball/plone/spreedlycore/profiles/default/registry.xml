@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <registry>
   <records interface="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings"
-           delete="True" />
-  <records interface="mooball.plone.spreedlycore.configlet.ISpreedlyGatewaySettings"
-           delete="True" />
+           remove="True" />
 </registry>
