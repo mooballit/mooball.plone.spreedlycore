@@ -23,6 +23,30 @@ import urllib2
 
 _ = MessageFactory('mooball.plone.spreedlycore')
 
+class SiteSpreedlyCredentials:
+    spreedly_login = None
+    spreedly_secret = None
+    default_spreedly_gateway = None
+
+    def __init__(self):
+        registry = queryUtility(IRegistry)
+        if registry is not None:
+            settings = registry.forInterface(ISpreedlyLoginSettings)
+            self.spreedly_login = settings.spreedly_login
+            self.spreedly_secret = settings.spreedly_secret
+            self.default_spreedly_gateway = settings.default_spreedly_gateway
+        else:
+            return None
+    
+    def getLogin(self):
+        return self.spreedly_login
+    
+    def getSecret(self):
+        return self.spreedly_secret
+    
+    def getGateway(self):
+        return self.default_spreedly_gateway
+
 class GatewayVocabulary(object):
     grok.implements(IVocabularyFactory)
     
