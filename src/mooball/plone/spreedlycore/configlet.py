@@ -94,7 +94,7 @@ class ISpreedlyLoginSettings(Interface):
 
 class SpreedlyLoginSettingsEditForm(controlpanel.RegistryEditForm):
     schema = ISpreedlyLoginSettings
-    id = u"SpreedlyLoginSettingsEditForm"
+    id = u"SpreedlyLoginSettingsForm"
     label = _(u"Spreedly Credentials Configuration")
     description = _(u"""""")
 

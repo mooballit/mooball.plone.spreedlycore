@@ -8,7 +8,7 @@
     $.updateSettings = function () {
         var spreedly_login = $("#content").hasClass("spreedly_login");
         var spreedly_secret = $("#content").hasClass("spreedly_secret");
-        var form = $("form#SpreedlyLoginSettingsEditForm");
+        var form = $("form#SpreedlyLoginSettingsForm");
         
         /* If all credentials filled in, show Gateway Drop Down, or disable */
         if ((spreedly_login === true) && (spreedly_secret == true)) {
@@ -37,7 +37,7 @@
          * submitting the form. Otherwise the z3c.form will raise errors on
          * the required attributes.
          **********************************************************************/
-        $("form#SpreedlyLoginSettingsEditForm").bind("submit", function (e) {
+        $("form#SpreedlyLoginSettingsForm").bind("submit", function (e) {
             $(this).find("select").removeAttr('disabled');
             $(this).submit();
         });

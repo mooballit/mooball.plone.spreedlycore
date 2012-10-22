@@ -20,6 +20,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="mooball.plone.spreedlycore Uninstall Profile"
+      directory="profiles/uninstall"
+      description="Removes mooball.plone.spreedlycore"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+  
   <browser:page
       for="Products.CMFCore.interfaces.ISiteRoot"
       name="spreedly_loginconfig"

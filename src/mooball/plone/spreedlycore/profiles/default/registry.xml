@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
 <registry>
-  <records interface="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings"
-           remove="True" />
+  <records interface="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings" />
 </registry>
