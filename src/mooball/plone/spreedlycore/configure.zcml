@@ -8,9 +8,10 @@
     i18n_domain="mooball.plone.spreedlycore">
 
   <five:registerPackage package="." initialize=".initialize" />
-  <include package="plone.app.registry" />
   <include package="five.grok" />
   <grok:grok package="." />
+
+  <adapter factory=".configlet.SpreedlySettingsControlPanelAdapter" />
 
   <genericsetup:registerProfile
       name="default"
@@ -29,9 +30,9 @@
       />
   
   <browser:page
-      for="Products.CMFCore.interfaces.ISiteRoot"
-      name="spreedly_loginconfig"
-      class=".configlet.SpreedlyLoginConfiglet"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="spreedly_settings"
+      class=".configlet.SpreedlySettings"
       permission="cmf.ManagePortal"
       />
   

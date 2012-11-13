@@ -1,23 +1,25 @@
-from plone.memoize.instance import memoize
 from five import grok
-
-from z3c.form import interfaces
-from z3c.form import button
-from zope import schema
-from zope.interface import Interface
-from plone.app.registry.browser import controlpanel
-from zope.i18nmessageid import MessageFactory
+from Products.CMFDefault.formlib.schema import SchemaAdapterBase
+from Products.CMFPlone.interfaces import IPloneSiteRoot
+from Products.CMFCore.interfaces import IPropertiesTool
+from zope.component import adapts
 
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.interfaces import IVocabularyFactory
 
 from plone.registry.interfaces import IRegistry
-from plone.registry import field
-from zope.component import queryUtility
+from zope.component import queryUtility, getUtility
+
+from plone.app.controlpanel.form import ControlPanelForm
+from plone.app.controlpanel.events import ConfigurationChangedEvent
 
 from Products.statusmessages.interfaces import IStatusMessage
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from zope.i18nmessageid import MessageFactory
 
+import zope.formlib.form
+import zope.interface
+import plone.app.controlpanel
+import zope.schema
 import spreedlycore
 import urllib2
 
@@ -68,116 +70,99 @@ class GatewayVocabulary(object):
         return SimpleVocabulary(terms)
 grok.global_utility(GatewayVocabulary, name=u"mooball.plone.spreedlycore.Gateway")
 
-class ISpreedlyLoginSettings(Interface):
+class ISpreedlyLoginSettings(zope.interface.Interface):
     """ Global Spreedly Login settings. This describes records stored in the
         configuration registry and obtainable via plone.registry.
     """
     
-    spreedly_login = field.TextLine(title=_(u"Spreedly Login"),
+    spreedly_login = zope.schema.TextLine(title=_(u"Spreedly Login"),
                                   description=_(u"spreedly_login",
                                                 default=u"Login to Spreedly."),
                                   required=True,
                                   default=None,)
 
-    spreedly_secret = field.TextLine(title=_(u"Spreedly Secret"),
+    spreedly_secret = zope.schema.TextLine(title=_(u"Spreedly Secret"),
                                   description=_(u"spreedly_secret",
                                                 default=u"Enter in Spreedly Secret here."),
                                   required=True,
                                   default=None,)
     
-    default_spreedly_gateway = field.Choice(title=_(u"Default Spreedly Gateway"),
+    default_spreedly_gateway = zope.schema.Choice(title=_(u"Default Spreedly Gateway"),
                                   description=_(u"default_spreedly_gateway",
-                                                default=u"Choose the Default Spreedly Gateway"),
+                                                default=u"Choose the Default Spreedly Gateway. Gateway objects must be instantiated via API outside this Application"),
                                   vocabulary=u"mooball.plone.spreedlycore.Gateway",
                                   required=False,
                                   default=None,)
 
-class SpreedlyLoginSettingsEditForm(controlpanel.RegistryEditForm):
-    schema = ISpreedlyLoginSettings
-    id = u"SpreedlyLoginSettingsForm"
-    label = _(u"Spreedly Credentials Configuration")
-    description = _(u"""""")
+class SpreedlySettingsControlPanelAdapter(SchemaAdapterBase):
+    """ Control Panel adapter """
 
-    def updateFields(self):
-        super(SpreedlyLoginSettingsEditForm, self).updateFields()
-
-    def updateWidgets(self):
-        super(SpreedlyLoginSettingsEditForm, self).updateWidgets()
+    adapts(IPloneSiteRoot)
+    zope.interface.implements(ISpreedlyLoginSettings)
     
-    @button.buttonAndHandler(_('Save'), name=None)
-    def handleSave(self, action):
+    def __init__(self, context):
+        super(SpreedlySettingsControlPanelAdapter, self).__init__(context)
+        registry = queryUtility(IRegistry)
+        if registry is not None:
+            self.settings = registry.forInterface(ISpreedlyLoginSettings)
+        else:
+            self.settings = None
+    
+    def get_spreedly_login(self):
+        return self.settings.spreedly_login
+    
+    def set_spreedly_login(self, login):
+        self.settings.spreedly_login = login
+    
+    def get_spreedly_secret(self):
+        return self.settings.spreedly_secret
+    
+    def set_spreedly_secret(self, secret):
+        self.settings.spreedly_secret = secret
+    
+    def get_default_spreedly_gateway(self):
+        return self.settings.default_spreedly_gateway
+    
+    def set_default_spreedly_gateway(self, gateway):
+        self.settings.default_spreedly_gateway = gateway
+    
+    spreedly_login = property(get_spreedly_login, set_spreedly_login)
+    spreedly_secret = property(get_spreedly_secret, set_spreedly_secret)
+    default_spreedly_gateway = property(get_default_spreedly_gateway, set_default_spreedly_gateway)
+
+class SpreedlySettings(ControlPanelForm):
+    zope.interface.implements(ISpreedlyLoginSettings)
+    
+    id = u"SpreedlyLoginSettingsForm"
+    form_name = u"Spreedly Credentials Configuration"
+    description = u""""""
+    form_fields = zope.formlib.form.FormFields(ISpreedlyLoginSettings)
+    
+    @zope.formlib.form.action(u'Save', name=u'save')
+    def handle_edit_action(self, action, data):
         """ When save button pressed, check for errors, attempt to connect to
             API, and throw error if key wrong, otherwise, continue.
         """
-        data, errors = self.extractData()
-        
-        if errors:
-            self.status = self.formErrorsMessage
-            return
+        plone.protect.CheckAuthenticator(self.request)
+        self.context.manage_changeProperties(**data)
         
         try:
             connect = spreedlycore.APIConnection(data['spreedly_login'], data['spreedly_secret'])
             gateway = connect.gateways()
         except urllib2.HTTPError, e:
             IStatusMessage(self.request).addStatusMessage(_(u"The credentials that were provided are incorrect. SpreedlyCore.com returned " + unicode(e)), "error")
-            self.context.REQUEST.RESPONSE.redirect("@@spreedly_loginconfig")
+            self.context.REQUEST.RESPONSE.redirect("@@spreedly_settings")
             return
         
-        self.applyChanges(data)
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"),
-                                                      "info")
-        self.context.REQUEST.RESPONSE.redirect("@@spreedly_loginconfig")
+        zope.formlib.form.applyChanges(self.context, self.form_fields, data,self.adapters)
+        
+        zope.event.notify(ConfigurationChangedEvent(self, data))
+        self.status = "Changes saved."
+        self.context.REQUEST.RESPONSE.redirect("@@spreedly_settings")
     
-    @button.buttonAndHandler(_('Cancel'), name='cancel')
+    @zope.formlib.form.action(u'Cancel', name=u'cancel')
     def handleCancel(self, action):
         IStatusMessage(self.request).addStatusMessage(_(u"Edit cancelled"),
                                                       "info")
         self.request.response.redirect("%s/%s" % (self.context.absolute_url(),
                                                   self.control_panel_view))
-
-class SpreedlyLoginConfiglet(controlpanel.ControlPanelFormWrapper):
-    """ Spreedly Login Configlet
-    """
-    form = SpreedlyLoginSettingsEditForm
-    index = ViewPageTemplateFile('configlet.pt')
-
-    def settings(self):
-        """ Returns the classes for use in the JavaScript to hide the Gateway
-            drop down select.
-        """
-        registry = queryUtility(IRegistry)
-        settings = registry.forInterface(ISpreedlyLoginSettings, check=False)
-        output = []
-        
-        if settings.spreedly_login:
-            output.append("spreedly_login")
-        
-        if settings.spreedly_secret:
-            output.append("spreedly_secret")
-        
-        if settings.default_spreedly_gateway:
-            output.append("default_spreedly_gateway")
-        
-        return ' '.join(output)
-    
-    def credentials_entered(self):
-        """ Check if the Login and Secret have been entered
-        """
-        classes = self.settings()
-        
-        if "spreedly_login" in classes and "spreedly_secret" in classes:
-            return True
-        else:
-            return False
-    
-    def gateway_entered(self):
-        """ Check if the Login and Secret have been entered, and if the gateway
-            has not. Used in the template to check middle case where there's no
-            gateway selected.
-        """
-        classes = self.settings()
-        
-        if "spreedly_login" in classes and "spreedly_secret" in classes and not "default_spreedly_gateway" in classes:
-            return False
-        else:
-            return True

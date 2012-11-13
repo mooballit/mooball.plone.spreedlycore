@@ -1,12 +1,4 @@
 <?xml version="1.0"?>
 <registry>
-  <record name="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings.spreedly_login"
-          delete="true"
-          />
-  <record name="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings.spreedly_secret"
-          delete="true"
-          />
-  <record name="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings.default_spreedly_gateway"
-          delete="true"
-          />
+  <records interface="mooball.plone.spreedlycore.configlet.ISpreedlyLoginSettings" remove="True" />
 </registry>

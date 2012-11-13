@@ -5,11 +5,11 @@
         i18n:domain="mooball.plone.spreedlycore">
           
  <configlet title="Spreedly Credentials Configuration"
-            action_id="mooball.plone.spreedlycore.configlet.SpreedlyLoginConfiglet"
+            action_id="spreedly_settings"
             appId="mooball.plone.spreedlycore"
             category="Products"
             condition_expr=""
-            url_expr="string:${portal_url}/@@spreedly_loginconfig"
+            url_expr="string:${portal_url}/@@spreedly_settings"
             visible="True"
             i18n:attributes="title"
             icon_expr="string:++resource++spreedly_icon.gif">

@@ -28,20 +28,8 @@
      * including all frames,
      **************************************************************************/
     $(window).load(function () {
-
         // Update settings on page load
         $.updateSettings();
-        
-        /**********************************************************************
-         * Remove the disabled attribute from all form elements before 
-         * submitting the form. Otherwise the z3c.form will raise errors on
-         * the required attributes.
-         **********************************************************************/
-        $("form#SpreedlyLoginSettingsForm").bind("submit", function (e) {
-            $(this).find("select").removeAttr('disabled');
-            $(this).submit();
-        });
-        
     });
 
     //#JSCOVERAGE_ENDIF
