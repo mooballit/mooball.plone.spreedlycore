@@ -161,8 +161,6 @@ class SpreedlySettings(ControlPanelForm):
         self.context.REQUEST.RESPONSE.redirect("@@spreedly_settings")
     
     @zope.formlib.form.action(u'Cancel', name=u'cancel')
-    def handleCancel(self, action):
-        IStatusMessage(self.request).addStatusMessage(_(u"Edit cancelled"),
-                                                      "info")
-        self.request.response.redirect("%s/%s" % (self.context.absolute_url(),
-                                                  self.control_panel_view))
+    def handle_cancel_action(self, action, data):
+        IStatusMessage(self.request).addStatusMessage(_("Changes canceled."), type="info")
+        return self.request.response.redirect(self.context.absolute_url() + '/plone_control_panel')
