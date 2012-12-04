@@ -1,6 +1,7 @@
 Changelog
 =========
 
+1.2.2 (released)
 1.0-dev (released)
 0.1-dev (unreleased)
 --------------------

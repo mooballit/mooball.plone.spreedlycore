@@ -69,7 +69,7 @@ class GatewayVocabulary(object):
                     terms.append(SimpleVocabulary.createTerm(
                             unicode(gateway.token),
                             unicode(gateway.token),
-                            unicode(gateway.data['gateway_type'])))
+                            unicode(gateway.data['gateway_type']+' | '+gateway.data['created_at'].strftime("%d-%b-%Y %H:%M GMT"))))
 
         return SimpleVocabulary(terms)
 grok.global_utility(GatewayVocabulary,
